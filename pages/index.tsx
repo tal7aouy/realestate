@@ -2,6 +2,9 @@ import type { NextPage } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Box, Flex, Text, Button } from '@chakra-ui/react'
+
+// import api
+import { baseUrl, fetchData } from '../utils/api'
 interface IBanner {
   purpose: string
   imgUrl: string
@@ -34,15 +37,16 @@ const Banner = ({
       <Text fontSize='lg' py='3' color='gray.700'>
         {desc1} <br /> {desc2}
       </Text>
-      <Button fontSize='xl' bg='blue.300' color='white'>
+      <Button fontSize='xl'>
         <Link href={url}>{btnText}</Link>
       </Button>
     </Box>
   </Flex>
 )
-const Home: NextPage = () => {
+const Home: NextPage = ({ propertiesForSale, propertiesForRent }) => {
+  console.log(propertiesForSale, propertiesForRent)
   return (
-    <div>
+    <Box>
       <Banner
         purpose='RENT A HOME'
         title1='Rental Homes for'
@@ -53,6 +57,11 @@ const Home: NextPage = () => {
         url='/search?purpose=for-rent'
         imgUrl='https://bayut-production.s3.eu-central-1.amazonaws.com/image/145426814/33973352624c48628e41f2ec460faba4'
       />
+      <Flex flexWrap='wrap'>
+        {propertiesForRent.map((property) => (
+          <Property property={property} key={property.id} />
+        ))}
+      </Flex>
       <Banner
         purpose='BUY A HOME'
         title1=' Find, Buy & Own Your'
@@ -63,8 +72,28 @@ const Home: NextPage = () => {
         url='/search?purpose=for-sale'
         imgUrl='https://bayut-production.s3.eu-central-1.amazonaws.com/image/110993385/6a070e8e1bae4f7d8c1429bc303d2008'
       />
-    </div>
+      {propertiesForSale.map((property) => (
+        <Property property={property} key={property.id} />
+      ))}
+    </Box>
   )
 }
 
 export default Home
+
+export const getStaticProps = async () => {
+  const propertyForSale = await fetchData(
+    `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-sale&hitsPerPage=6`
+  )
+  const propertyForRent = await fetchData(
+    `${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-rent&hitsPerPage=6`
+  )
+
+  // return properties
+  return {
+    props: {
+      propertiesForSale: propertyForSale?.hits,
+      propertiesForRent: propertyForRent?.hits,
+    },
+  }
+}
