@@ -12,6 +12,7 @@ import {
 import { FcMenu, FcHome, FcAbout } from 'react-icons/fc'
 import { BsSearch } from 'react-icons/bs'
 import { FiKey } from 'react-icons/fi'
+import ThemeButton from './ThemeButton'
 function Navbar() {
   return (
     <Flex
@@ -29,6 +30,7 @@ function Navbar() {
             variant='outlined'
             color='red.400'
           />
+          <ThemeButton />
           <MenuList>
             <Link href='/' passHref>
               <MenuItem icon={<FcHome />}>Home</MenuItem>
